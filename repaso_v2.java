@@ -29,10 +29,10 @@ public class repaso_v2{
 
         imprimirR(R);
 
-        if(filaQueMasAumentosTuvo != 0){
-            System.out.println("La seleccion que mas veces aumento fue la nro:  "+filaQueMasAumentosTuvo);
-        }else{
+        if(filaQueMasAumentosTuvo == -1){
             System.out.println("No hubo ninguna selección que haya cumplido la condición");
+        }else{
+            System.out.println("La seleccion que mas veces aumento fue la nro:  "+filaQueMasAumentosTuvo);
         }
         
     }
@@ -45,6 +45,7 @@ public class repaso_v2{
         int cantGolesPartidoAnterior = 0;
         int cantDeAumentos = 0;
         int cantDePartidos = 0;
+        boolean enAumento = false;
 
         while(inicio < fila.length){ //comienzo a buscar el inicio de la proxima secuencia
             inicio = buscarInicio(fila, fin+1);
@@ -53,20 +54,26 @@ public class repaso_v2{
                 fin = buscarFin(fila, inicio);
                 cantGolesPartidoActual = procesarPartido(fila, inicio, fin, T);
                 cantDePartidos++;//cuenta los partidos procesados
-                
+
                 if(cantDePartidos >= 2 && cantGolesPartidoActual > cantGolesPartidoAnterior){
                     cantDeAumentos++;
                     cantGolesPartidoAnterior = cantGolesPartidoActual; //guardo los goles del partido recien procesado
+                    enAumento = true;
+                }else if(cantDePartidos == 1 && cantGolesPartidoActual >= 1){ //si es el primer partido y hubo almenos 1 gol en parametro guardo los goles para compara con el 2do partido.
+                    cantGolesPartidoAnterior = cantGolesPartidoActual;
+                    enAumento = true;
+                }else{
+                    enAumento = false;
                 }
             }
         }
 
-        if(cantDePartidos >= 2 && cantDePartidos == cantDeAumentos){ //si hubo al menos 2 partidos y coincide la cantidad de partidos con la cantidad de aumentos, se inserta en R la seleccion.
+        if(cantDePartidos >= 2 && enAumento == true){ //si hubo al menos 2 partidos y enAumento se mantuvo desde el inicio en true, agrego en R la selección (nro de fila).
             insertarSeleccionEnR(nro_de_fila, R);
             return cantDeAumentos;
         }else{
-            return 0;
-        }
+            return 0; //retorno 0, si alguna vez no se produjo un aumento en goles en parametro o la cantidad de partidos no fue mayor a 1.
+        }             //de esta forma diferencio las selecciones que cumplieron o no las condición, para luego comparar cual fue la que mas veces aumento.
     }
 
     public static int procesarPartido(int [] fila, int inicio, int fin, int [] T){
@@ -126,7 +133,6 @@ public class repaso_v2{
         }
         System.out.println("");
     }
-
 
 
 
