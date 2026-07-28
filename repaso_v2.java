@@ -21,9 +21,12 @@ public class repaso_v2{
 
         for(int fila = 0; fila<matriz.length;fila++){ //recorro fila x fila
             vecesQueAumentoFilaActual = procesarSeleccion(matriz[fila], R, T, fila);
-            if(vecesQueAumentoFilaActual != 0 && vecesQueAumentoFilaActual > vecesQueAumentoFilaAnterior){
-                filaQueMasAumentosTuvo = fila;
-                vecesQueAumentoFilaAnterior = vecesQueAumentoFilaActual;
+
+            if(vecesQueAumentoFilaActual != 0){
+                if (vecesQueAumentoFilaActual > vecesQueAumentoFilaAnterior) {
+                    filaQueMasAumentosTuvo = fila;
+                    vecesQueAumentoFilaAnterior = vecesQueAumentoFilaActual;
+                }
             }
         }
 
@@ -43,32 +46,32 @@ public class repaso_v2{
         int fin = -1;
         int cantGolesPartidoActual = 0;
         int cantGolesPartidoAnterior = 0;
-        int cantDeAumentos = 0;
-        int cantDePartidos = 0;
-        boolean enAumento = false;
+        int cantDeAumentos = 0; //veces que hubo aumentos en la fila procesada
+        int cantDePartidos = 0; //cantidad de secuencias que tiene la fila procesada
 
         while(inicio < fila.length){ //comienzo a buscar el inicio de la proxima secuencia
             inicio = buscarInicio(fila, fin+1);
 
             if(inicio < fila.length){
                 fin = buscarFin(fila, inicio);
-                cantGolesPartidoActual = procesarPartido(fila, inicio, fin, T);
-                cantDePartidos++;//cuenta los partidos procesados
 
-                if(cantDePartidos >= 2 && cantGolesPartidoActual > cantGolesPartidoAnterior){
-                    cantDeAumentos++;
-                    cantGolesPartidoAnterior = cantGolesPartidoActual; //guardo los goles del partido recien procesado
-                    enAumento = true;
-                }else if(cantDePartidos == 1 && cantGolesPartidoActual >= 1){ //si es el primer partido y hubo almenos 1 gol en parametro guardo los goles para compara con el 2do partido.
-                    cantGolesPartidoAnterior = cantGolesPartidoActual;
-                    enAumento = true;
-                }else{
-                    enAumento = false;
-                }
+                cantGolesPartidoActual = procesarPartido(fila, inicio, fin, T);
+                cantDePartidos++;//cuenta los partidos procesados.
+
+                    if(cantDePartidos == 1){ //si es el 1er partido
+                        cantGolesPartidoAnterior = cantGolesPartidoActual;
+                    }else{ //si es el 2do. partido u otro
+                        if(cantGolesPartidoActual > cantGolesPartidoAnterior){
+                            cantGolesPartidoAnterior = cantGolesPartidoActual;
+                            cantDeAumentos++;
+                        }else{
+                            cantGolesPartidoAnterior = cantGolesPartidoActual;
+                        }
+                    }
             }
         }
 
-        if(cantDePartidos >= 2 && enAumento == true){ //si hubo al menos 2 partidos y enAumento se mantuvo desde el inicio en true, agrego en R la selección (nro de fila).
+        if(cantDePartidos > 1 && cantDeAumentos == cantDePartidos-1){ //debo asegurar de que halla habido al menos 2 partidos.
             insertarSeleccionEnR(nro_de_fila, R);
             return cantDeAumentos;
         }else{
@@ -123,8 +126,8 @@ public class repaso_v2{
     }
 
     public static boolean esSeparador(int pos){
-        if(pos > 0)return false;
-        return true;
+        if(pos < 0) return true;
+        return false;
     }
 
     public static void imprimirR (int [] arregloR){
